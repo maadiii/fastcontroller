@@ -1,4 +1,4 @@
-package fast
+package fastcontroller
 
 import (
 	"strings"
@@ -33,7 +33,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func MakeJWT(cfg config.JWT, id uint, username string, role Role, perms ...Permission) (string, error) {
+func MakeJWT(cfg JWT, id uint, username string, role Role, perms ...Permission) (string, error) {
 	expiresAt := time.Now().Add(time.Second * time.Duration(cfg.MaxAge))
 	claims := Claims{
 		ID:          id,
@@ -55,7 +55,7 @@ func MakeJWT(cfg config.JWT, id uint, username string, role Role, perms ...Permi
 	return ss, nil
 }
 
-func GetClaimsFromJWT(cfg config.JWT, token []byte) (*Claims, error) {
+func GetClaimsFromJWT(cfg JWT, token []byte) (*Claims, error) {
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		return cfg.Secret, nil
 	}
@@ -79,7 +79,7 @@ func GetClaimsFromJWT(cfg config.JWT, token []byte) (*Claims, error) {
 	return tkn.Claims.(*Claims), nil
 }
 
-func Authorize(ctx *Context, cfg config.JWT, r Role, perms ...Permission) error {
+func Authorize(ctx *Context, cfg JWT, r Role, perms ...Permission) error {
 	tkn := ctx.Request.Header.Cookie("access_token")
 	if r == ServiceRole {
 		tkn = ctx.Request.Header.Peek("Authorization")

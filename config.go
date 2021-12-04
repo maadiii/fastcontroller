@@ -1,4 +1,4 @@
-package fast
+package fastcontroller
 
 import (
 	"fmt"

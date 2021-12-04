@@ -1,4 +1,4 @@
-package fast
+package fastcontroller
 
 import (
 	"bytes"
@@ -13,13 +13,13 @@ import (
 
 type Controller struct {
 	Log    logrus.FieldLogger
-	Config *config.Config
+	Config *Config
 
 	Authorize    fnAuthorzie
 	RefreshToken fnRefreshToken
 }
 
-func NewController(l logrus.FieldLogger, a fnAuthorzie, r fnRefreshToken, c *config.Config) Controller {
+func NewController(l logrus.FieldLogger, a fnAuthorzie, r fnRefreshToken, c *Config) Controller {
 	return Controller{l, c, a, r}
 }
 

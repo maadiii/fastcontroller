@@ -1,4 +1,4 @@
-package fast
+package fastcontroller
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 
 type (
 	fnAction       func(*Context) error
-	fnAuthorzie    func(*Context, config.JWT, Role, ...Permission) error
+	fnAuthorzie    func(*Context, JWT, Role, ...Permission) error
 	fnRefreshToken func(id int64) (string, error)
 )
 
