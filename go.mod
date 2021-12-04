@@ -1,4 +1,4 @@
-module fastcontroller
+module github.com/mehdiazizii/fastcontroller
 
 go 1.17
 
