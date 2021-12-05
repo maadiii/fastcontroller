@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/pkg/errors"
@@ -11,31 +12,67 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+type fnAction func(*Context) error
+
 type Controller struct {
 	Log    logrus.FieldLogger
 	Config *Config
-
-	Authorize    fnAuthorzie
-	RefreshToken fnRefreshToken
 }
 
-func NewController(l logrus.FieldLogger, a fnAuthorzie, r fnRefreshToken, c *Config) Controller {
-	return Controller{l, c, a, r}
+func NewController(l logrus.FieldLogger, c *Config) Controller {
+	return Controller{l, c}
 }
 
-func (c *Controller) Handle(f fnAction, r Role, p ...Permission) fasthttp.RequestHandler {
+func (c *Controller) Handle(f fnAction) fasthttp.RequestHandler {
 	return func(req *fasthttp.RequestCtx) {
 		beginTime := time.Now()
 		ctx := &Context{RequestCtx: req}
 		defer logRequest(*ctx, c.Log, beginTime)
 		defer handlePanic(ctx, c.Log)
 
-		if err := c.Authorize(ctx, c.Config.JWT, r, p...); err != nil {
+		if err := f(ctx); err != nil {
 			handleHttpError(ctx, err)
-			return
+		}
+	}
+}
+
+func (c *Controller) Authorize(f fnAction, r Role, perms ...Permission) fnAction {
+	return func(ctx *Context) error {
+		tkn := ctx.Request.Header.Cookie("access_token")
+		if r == ServiceRole {
+			tkn = ctx.Request.Header.Peek("Authorization")
 		}
 
-		f.Invoke(ctx)
+		claims, err := GetClaimsFromJWT(c.Config.JWT, tkn)
+		if err != nil {
+			if r == ServiceRole {
+				return ErrUnauthorized(err)
+			}
+
+			// TODO: refresh token for users
+			// if r != NoRole && err.(ErrorResponseType).IsErrExpiredToken() {
+			// }
+
+			return errors.New(err.Error())
+		}
+
+		if r != NoRole && claims.Role != r {
+			return ErrForbiden()
+		}
+
+		if len(perms) > 0 {
+			for _, p := range perms {
+				if !PermissionExist(p, claims.Permissions) {
+					return ErrForbiden()
+				}
+			}
+		}
+
+		if r != ServiceRole {
+			ctx = ctx.WithIdentify(claims.ID, claims.Username, claims.Role, claims.Permissions...)
+		}
+
+		return f(ctx)
 	}
 }
 
@@ -86,4 +123,28 @@ func (c Controller) jsonToResponse(r *fasthttp.Response, v interface{}) error {
 	r.Header.Add("charset", "utf8")
 
 	return nil
+}
+
+func handlePanic(ctx *Context, log logrus.FieldLogger) {
+	if r := recover(); r != nil {
+		log.Errorf("%v: %s", r, debug.Stack())
+		ctx.Response.Header.Add("Content-Type", "text/plain; charset=utf-8")
+		ctx.Response.Header.Add("X-Content-Type-Options", "nosniff")
+		ctx.Response.SetStatusCode(http.StatusInternalServerError)
+		ctx.Response.SetBody([]byte(http.StatusText(http.StatusInternalServerError)))
+	}
+}
+
+func logRequest(ctx Context, l logrus.FieldLogger, beginTime time.Time) {
+	logger := l.WithFields(
+		logrus.Fields{
+			"duration":    time.Since(beginTime),
+			"status_code": ctx.Response.StatusCode,
+			"remote":      ctx.ReadUserIP(),
+			"status":      ctx.Response.StatusCode(),
+		},
+	)
+	logger.Info(
+		string(ctx.RequestCtx.Method()), string(ctx.Request.URI().RequestURI()),
+	)
 }
