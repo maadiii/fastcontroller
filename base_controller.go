@@ -16,14 +16,14 @@ type fnAction func(*Context) error
 
 type Controller struct {
 	Log    logrus.FieldLogger
-	Config *Config
+	Config Config
 }
 
-func NewController(l logrus.FieldLogger, c *Config) Controller {
+func NewController(l logrus.FieldLogger, c Config) Controller {
 	return Controller{l, c}
 }
 
-func (c *Controller) Handle(f fnAction) fasthttp.RequestHandler {
+func (c Controller) Handle(f fnAction) fasthttp.RequestHandler {
 	return func(req *fasthttp.RequestCtx) {
 		beginTime := time.Now()
 		ctx := &Context{RequestCtx: req}
@@ -36,7 +36,7 @@ func (c *Controller) Handle(f fnAction) fasthttp.RequestHandler {
 	}
 }
 
-func (c *Controller) Authorize(f fnAction, r Role, perms ...Permission) fnAction {
+func (c Controller) Authorize(f fnAction, r Role, perms ...Permission) fnAction {
 	return func(ctx *Context) error {
 		tkn := ctx.Request.Header.Cookie("access_token")
 		if r == ServiceRole {
@@ -76,7 +76,7 @@ func (c *Controller) Authorize(f fnAction, r Role, perms ...Permission) fnAction
 	}
 }
 
-func (c *Controller) SetJWT(ctx *Context, tkn string) {
+func (c Controller) SetJWT(ctx *Context, tkn string) {
 	cookie := new(fasthttp.Cookie)
 	cookie.SetKey("access_token")
 	cookie.SetValue("Bearer " + tkn)

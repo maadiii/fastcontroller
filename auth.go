@@ -79,43 +79,6 @@ func GetClaimsFromJWT(cfg JWT, token []byte) (*Claims, error) {
 	return tkn.Claims.(*Claims), nil
 }
 
-func Authorize(ctx *Context, cfg JWT, r Role, perms ...Permission) error {
-	tkn := ctx.Request.Header.Cookie("access_token")
-	if r == ServiceRole {
-		tkn = ctx.Request.Header.Peek("Authorization")
-	}
-	claims, err := GetClaimsFromJWT(cfg, tkn)
-	if err != nil {
-		if r == ServiceRole {
-			return ErrUnauthorized(err)
-		}
-
-		// TODO: refresh token for users
-		// if r != NoRole && err.(ErrorResponseType).IsErrExpiredToken() {
-		// }
-
-		return errors.New(err.Error())
-	}
-
-	if r != NoRole && claims.Role != r {
-		return ErrForbiden()
-	}
-
-	if len(perms) > 0 {
-		for _, p := range perms {
-			if !PermissionExist(p, claims.Permissions) {
-				return ErrForbiden()
-			}
-		}
-	}
-
-	if r != ServiceRole {
-		ctx = ctx.WithIdentify(claims.ID, claims.Username, claims.Role, claims.Permissions...)
-	}
-
-	return nil
-}
-
 func PermissionExist(perm Permission, perms []Permission) bool {
 	for _, p := range perms {
 		if perm == p {
