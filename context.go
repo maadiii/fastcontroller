@@ -1,4 +1,4 @@
-package main
+package fastcontroller
 
 import "github.com/valyala/fasthttp"
 
