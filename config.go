@@ -15,14 +15,12 @@ var (
 )
 
 type Config struct {
-	DevMode        bool
-	SecretKey      string
-	JWT            JWT
-	HTTPPort       int
-	DbSession      SessionConfig
-	DockerRegistry string
-	Agent          Agent
-	Templates      string
+	DevMode   bool
+	SecretKey string
+	JWT       JWT
+	HTTPPort  int
+	DbSession SessionConfig
+	Agent     Agent
 }
 
 type Agent struct {
