@@ -99,6 +99,12 @@ func (c Controller) EncodeJson(ctx *Context, statusCode int, v interface{}) erro
 	return nil
 }
 
+func (c Controller) Response(ctx *Context, statusCode int) error {
+	ctx.Response.SetStatusCode(statusCode)
+
+	return nil
+}
+
 func (c Controller) DecodeJson(ctx *Context, v interface{}) error {
 	err := json.Unmarshal(ctx.PostBody(), &v)
 	if err != nil {
