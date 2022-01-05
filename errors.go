@@ -89,3 +89,11 @@ func ErrValidation(message string, err error) errorResponseType {
 		internalError: err,
 	}
 }
+
+func ErrAlreadyExist(field string, err error) errorResponseType {
+	return errorResponseType{
+		httpCode:      http.StatusNotAcceptable,
+		httpMessage:   fmt.Sprintf("%s already exist", field),
+		internalError: err,
+	}
+}
