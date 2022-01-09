@@ -53,7 +53,7 @@ func (c Controller) Authorize(f fnAction, r Role, perms ...Permission) fnAction 
 			// if r != NoRole && err.(ErrorResponseType).IsErrExpiredToken() {
 			// }
 
-			return errors.New(err.Error())
+			return errors.Wrap(err, "")
 		}
 
 		if r != NoRole && claims.Role != r {
