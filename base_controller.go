@@ -44,7 +44,7 @@ func (c Controller) Authorize(f fnAction, r Role, perms ...Permission) fnAction 
 		}
 
 		if r != NoRole || len(perms) > 0 {
-			return ErrUnauthorized(errors.New("empty Authorization header or access_token cookie"))
+			return ErrUnauthorized(errors.Wrap(errors.New("empty Authorization header or access_token cookie"), "invalid token"))
 		}
 
 		claims, err := GetClaimsFromJWT(c.Config.JWT, tkn)
