@@ -43,6 +43,10 @@ func (c Controller) Authorize(f fnAction, r Role, perms ...Permission) fnAction 
 			tkn = ctx.Request.Header.Peek("Authorization")
 		}
 
+		if r != NoRole || len(perms) > 0 {
+			return ErrUnauthorized(errors.New("empty Authorization header or access_token cookie"))
+		}
+
 		claims, err := GetClaimsFromJWT(c.Config.JWT, tkn)
 		if err != nil {
 			if r == ServiceRole {
