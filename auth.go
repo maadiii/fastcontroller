@@ -68,12 +68,7 @@ func GetClaimsFromJWT(cfg JWT, token []byte) (*Claims, error) {
 	}
 	tkn, err := jwt.ParseWithClaims(tknString, claims, keyFunc)
 	if err != nil {
-		e, ok := err.(*jwt.ValidationError)
-		if ok && e.Errors == jwt.ValidationErrorExpired {
-			return nil, errors.Wrap(err, "expired token")
-		}
-
-		return nil, errors.Wrap(err, "invalid token")
+		return nil, ErrUnauthorized(errors.Wrap(err, ""))
 	}
 
 	return tkn.Claims.(*Claims), nil

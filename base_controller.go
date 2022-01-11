@@ -50,14 +50,12 @@ func (c Controller) Authorize(f fnAction, r Role, perms ...Permission) fnAction 
 		claims, err := GetClaimsFromJWT(c.Config.JWT, tkn)
 		if err != nil {
 			if r == ServiceRole {
-				return ErrUnauthorized(err)
+				return err
 			}
 
 			// TODO: refresh token for users
-			// if r != NoRole && err.(ErrorResponseType).IsErrExpiredToken() {
-			// }
 
-			return errors.Wrap(err, "")
+			return err
 		}
 
 		if r != NoRole && claims.Role != r {
