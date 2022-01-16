@@ -146,10 +146,9 @@ func handlePanic(ctx *Context, log logrus.FieldLogger) {
 func logRequest(ctx Context, l logrus.FieldLogger, beginTime time.Time) {
 	logger := l.WithFields(
 		logrus.Fields{
-			"duration":    time.Since(beginTime),
-			"status_code": ctx.Response.StatusCode,
-			"remote":      ctx.ReadUserIP(),
-			"status":      ctx.Response.StatusCode(),
+			"duration": time.Since(beginTime),
+			"remote":   ctx.ReadUserIP(),
+			"status":   ctx.Response.StatusCode(),
 		},
 	)
 	logger.Info(
