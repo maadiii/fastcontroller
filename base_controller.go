@@ -116,10 +116,12 @@ func (c Controller) DecodeJson(ctx *Context, v interface{}) error {
 	return nil
 }
 
-func (c Controller) View(ctx *Context, buff *bytes.Buffer) {
+func (c Controller) View(ctx *Context, buff *bytes.Buffer) error {
 	ctx.Response.Header.Add("Content-Type", "text/html")
 	ctx.Response.SetStatusCode(http.StatusOK)
 	ctx.Response.AppendBodyString(buff.String())
+
+	return nil
 }
 
 func (c Controller) jsonToResponse(r *fasthttp.Response, v interface{}) error {
