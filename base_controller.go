@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"runtime/debug"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -45,11 +44,6 @@ func (c Controller) HandleW(f fnAction) fasthttp.RequestHandler {
 		defer handlePanic(ctx, c.Log)
 
 		if err := f(ctx); err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusUnauthorized)) ||
-				strings.Contains(err.Error(), http.StatusText(http.StatusForbidden)) {
-				ctx.Redirect("/login", http.StatusFound)
-				return
-			}
 			handleHttpError(ctx, err)
 		}
 	}

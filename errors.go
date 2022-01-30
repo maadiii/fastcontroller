@@ -12,6 +12,10 @@ func handleHttpError(ctx *Context, err error) {
 	ctx.Response.Header.Add("Content-Type", "text/plain; charset=utf-8")
 	ctx.Response.Header.Add("X-Content-Type-Options", "nosniff")
 	if e, ok := err.(ErrorResponseType); ok {
+		if e.HTTPCode() == 401 || e.HTTPCode() == 403 {
+			ctx.Redirect("/login", http.StatusFound)
+			return
+		}
 		logrus.Errorf("%+v\r\n", e.InternalError())
 		ctx.Response.SetStatusCode(e.HTTPCode())
 		ctx.Response.SetBody([]byte(e.HTTPMessage()))
