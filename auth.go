@@ -22,6 +22,7 @@ const (
 )
 
 const (
+	// NoPermission
 	NoPermission Permission = iota
 )
 
