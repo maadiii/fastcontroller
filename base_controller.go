@@ -20,7 +20,6 @@ type Controller struct {
 	Config Config
 }
 
-// NewController has new controller
 func NewController(l logrus.FieldLogger, c Config) Controller {
 	return Controller{l, c}
 }
