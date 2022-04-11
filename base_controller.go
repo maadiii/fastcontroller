@@ -37,6 +37,7 @@ func (c Controller) Handle(f fnAction) fasthttp.RequestHandler {
 	}
 }
 
+// TODO: fix error handling
 func (c Controller) HandleW(f fnAction) fasthttp.RequestHandler {
 	return func(req *fasthttp.RequestCtx) {
 		beginTime := time.Now()
