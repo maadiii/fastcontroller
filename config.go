@@ -6,13 +6,11 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-var (
-	JwtAlgorithms = map[string]*jwt.SigningMethodHMAC{
-		"HS256": jwt.SigningMethodHS256,
-		"HS384": jwt.SigningMethodHS384,
-		"HS512": jwt.SigningMethodHS512,
-	}
-)
+var JwtAlgorithms = map[string]*jwt.SigningMethodHMAC{
+	"HS256": jwt.SigningMethodHS256,
+	"HS384": jwt.SigningMethodHS384,
+	"HS512": jwt.SigningMethodHS512,
+}
 
 type Config struct {
 	DevMode   bool
@@ -20,17 +18,6 @@ type Config struct {
 	JWT       JWT
 	HTTPPort  int
 	DbSession SessionConfig
-	Agent     Agent
-}
-
-type Agent struct {
-	Port uint16
-	API  AgentApis
-}
-
-type AgentApis struct {
-	Start string
-	Stop  string
 }
 
 type JWT struct {
