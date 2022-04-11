@@ -109,7 +109,7 @@ func (c Controller) SetJWT(ctx *Context, tkn string) {
 	ctx.Response.Header.SetCookie(cookie)
 }
 
-func (c Controller) EncodeJson(ctx *Context, statusCode int, v interface{}) error {
+func (c Controller) ResponseWithJson(ctx *Context, statusCode int, v interface{}) error {
 	if v != nil {
 		if err := c.jsonToResponse(&ctx.Response, v); err != nil {
 			return errors.Wrap(err, "")
