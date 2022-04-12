@@ -68,7 +68,7 @@ func (s SessionConfig) DsnWithSchema() string {
 	return dsn
 }
 
-func (s SessionConfig) AmdinDsn() string {
+func (s SessionConfig) AdminDsn() string {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		s.Host, s.Port, s.User, s.Password, s.AdminDBName, s.SslMode,
